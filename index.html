@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#090909">
+<title>NEXORA TOOLS — Performance Control Center</title>
+<style>
+:root{
+  --bg:#070707; --panel:#151515; --panel2:#1d1d1d; --panel3:#262626;
+  --accent:#ffd21a; --accent2:#c58b00; --text:#f5f5f5; --muted:#a8a8a8;
+  --line:rgba(255,255,255,.08); --shadow:0 18px 45px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:#050307;color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+body{display:flex;justify-content:center}
+button{font:inherit;color:inherit;border:0;cursor:pointer}
+.app{width:min(100%,520px);min-height:100vh;background:linear-gradient(180deg,#090909 0%,#050505 100%);position:relative;overflow:hidden}
+.noise{position:fixed;inset:0;pointer-events:none;opacity:.035;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 140 140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.header{height:72px;padding:14px 16px 10px;background:linear-gradient(180deg,#191919,#0c0c0c);display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--line)}
+.logo{width:38px;height:38px;border-radius:13px;background:linear-gradient(135deg,#5b4300,#ffd21a);display:grid;place-items:center;box-shadow:0 0 24px rgba(255,210,26,.3)}
+.logo svg{width:25px;height:25px}
+.brand{font-weight:900;letter-spacing:.8px;font-size:16px}
+.sub{font-size:9px;color:#9e9e9e;margin-top:2px;letter-spacing:.25px}
+.status{margin-left:auto;display:flex;align-items:center;gap:6px;font-size:9px;color:#caa7d4}
+.dot{width:7px;height:7px;border-radius:50%;background:#56f39a;box-shadow:0 0 10px #56f39a}
+.content{padding:12px 14px 92px}
+.pills{display:flex;gap:8px;overflow:auto;padding:2px 0 12px;scrollbar-width:none}
+.pills::-webkit-scrollbar{display:none}
+.pill{flex:0 0 auto;padding:8px 15px;border-radius:999px;background:#29230d;color:#c8b56b;font-size:10px;font-weight:800;transition:.2s}
+.pill.active{background:linear-gradient(135deg,#e3a900,#ffd21a);color:white;box-shadow:0 0 18px rgba(255,210,26,.25)}
+.sectionbar{height:9px;border-radius:999px;background:linear-gradient(90deg,#25200d,#171717);margin:0 0 12px;position:relative;overflow:hidden}
+.sectionbar:after{content:"";position:absolute;left:28%;width:24%;height:100%;background:#d9a900;border-radius:999px;opacity:.45;filter:blur(3px)}
+.cards{display:grid;gap:9px}
+.card{background:linear-gradient(145deg,#1e1e1e,#111111);border:1px solid rgba(255,255,255,.045);border-radius:14px;padding:13px 12px;display:flex;gap:11px;align-items:center;min-height:76px;box-shadow:var(--shadow);transition:transform .18s,border-color .18s,box-shadow .18s}
+.card:hover{transform:translateY(-1px);border-color:rgba(255,210,26,.22)}
+.icon{width:38px;height:38px;flex:0 0 38px;border-radius:12px;background:#29230d;display:grid;place-items:center;color:#ffd21a}
+.icon svg{width:25px;height:25px;stroke:currentColor}
+.info{min-width:0;flex:1}
+.title{font-size:11px;font-weight:900;color:#ffd21a;letter-spacing:.25px;display:flex;align-items:center;gap:5px}
+.vip{font-size:7px;line-height:1;padding:3px 4px;border-radius:4px;background:#d932ff;color:white;font-weight:900}
+.desc{font-size:8.5px;line-height:1.3;color:#bda5c5;margin-top:4px}
+.switch{width:38px;height:21px;border-radius:999px;background:#343019;padding:3px;position:relative;flex:0 0 auto;transition:.25s}
+.switch i{display:block;width:15px;height:15px;border-radius:50%;background:#d6a900;transition:.25s;box-shadow:0 0 8px rgba(255,210,26,.4)}
+.switch.on{background:#66500b;box-shadow:0 0 14px rgba(255,210,26,.22)}
+.switch.on i{transform:translateX(17px);background:#fff1a6}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:9px}
+.mini{min-height:84px;padding:12px;border-radius:13px;background:linear-gradient(145deg,#281035,#1e0c29);border:1px solid rgba(255,255,255,.04)}
+.mini .title{font-size:10px}
+.mini .desc{font-size:8px}
+.mini-bottom{display:flex;justify-content:space-between;align-items:center;margin-top:9px;color:#aa91b1;font-size:8px}
+.range{appearance:none;width:100%;height:4px;border-radius:99px;background:#4b185d;outline:none;margin-top:10px}
+.range::-webkit-slider-thumb{appearance:none;width:14px;height:14px;border-radius:50%;background:#e12aff;box-shadow:0 0 10px rgba(225,42,255,.5)}
+.bottom{position:fixed;bottom:0;width:min(100%,520px);height:68px;background:rgba(24,8,35,.96);backdrop-filter:blur(14px);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(4,1fr);z-index:20}
+.nav{background:none;display:grid;place-items:center;gap:2px;color:#888888;font-size:8px;padding-top:7px}
+.nav svg{width:19px;height:19px;stroke:currentColor}
+.nav.active{color:#ffd21a}
+.nav.active .navicon{background:#3a300e;border-radius:10px;padding:4px}
+.toast{position:fixed;left:50%;bottom:82px;transform:translate(-50%,20px);opacity:0;pointer-events:none;background:#29230d;border:1px solid #8d6d08;padding:10px 14px;border-radius:12px;font-size:10px;box-shadow:0 10px 30px rgba(0,0,0,.4);transition:.25s;z-index:50;white-space:nowrap}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.boot{position:fixed;inset:0;background:#050505;z-index:100;display:grid;place-items:center;transition:opacity .55s,visibility .55s}
+.boot.hide{opacity:0;visibility:hidden}
+.bootbox{width:min(88vw,360px);text-align:center}
+.bootlogo{width:72px;height:72px;margin:0 auto 18px;border-radius:24px;background:linear-gradient(135deg,#604700,#ffd21a);display:grid;place-items:center;box-shadow:0 0 45px rgba(255,210,26,.42);animation:pulse 1.2s infinite alternate}
+.bootlogo svg{width:44px;height:44px}
+.bootname{font-weight:1000;letter-spacing:2px;font-size:24px}
+.bootsub{font-size:10px;color:#9e9e9e;margin-top:5px}
+.progress{height:6px;background:#252525;border-radius:999px;margin-top:28px;overflow:hidden}
+.progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,#a97800,#ffd21a);box-shadow:0 0 20px #ffd21a;border-radius:999px;transition:width .25s}
+.bootlog{height:80px;margin-top:15px;text-align:left;font:10px/1.7 ui-monospace,monospace;color:#c4b77a;overflow:hidden}
+.bootlog b{color:#f04aff}
+@keyframes pulse{to{transform:scale(1.08);box-shadow:0 0 70px rgba(255,210,26,.72)}}
+.hidden{display:none!important}
+.empty{padding:32px 10px;text-align:center;color:#9e9e9e;font-size:11px}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="noise"></div>
+
+<div class="boot" id="boot">
+  <div class="bootbox">
+    <div class="bootlogo">
+      <svg viewBox="0 0 48 48" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M8 16 24 8l16 8-16 8L8 16Z"/><path d="M8 24l16 8 16-8"/><path d="M8 32l16 8 16-8"/>
+      </svg>
+    </div>
+    <div class="bootname">NEXORA TOOLS</div>
+    <div class="bootsub">PERFORMANCE CONTROL CENTER</div>
+    <div class="progress"><i id="bar"></i></div>
+    <div class="bootlog" id="bootlog"></div>
+  </div>
+</div>
+
+<header class="header">
+  <div class="logo">
+    <svg viewBox="0 0 48 48" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M8 16 24 8l16 8-16 8L8 16Z"/><path d="M8 24l16 8 16-8"/><path d="M8 32l16 8 16-8"/>
+    </svg>
+  </div>
+  <div><div class="brand">NEXORA TOOLS</div><div class="sub">PERFORMANCE CONTROL CENTER</div></div>
+  <div class="status"><span class="dot"></span> READY</div>
+</header>
+
+<main class="content">
+  <div class="pills" id="pills">
+    <button class="pill active" data-cat="aiming">Aiming</button>
+    <button class="pill" data-cat="optimizer">Optimizer</button>
+    <button class="pill" data-cat="network">Network</button>
+    <button class="pill" data-cat="generator">Generator</button>
+  </div>
+  <div class="sectionbar"></div>
+  <div id="cards" class="cards"></div>
+</main>
+
+<nav class="bottom">
+  <button class="nav" data-page="info"><span class="navicon"><svg fill="none" viewBox="0 0 24 24"><path d="M4 5h16v14H4zM8 9h8M8 13h5" stroke="currentColor" stroke-width="1.7"/></svg></span><span>Information</span></button>
+  <button class="nav active" data-page="tools"><span class="navicon"><svg fill="none" viewBox="0 0 24 24"><path d="m8 7 4-3 4 3-4 3-4-3Zm0 5 4 3 4-3M8 17l4 3 4-3" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg></span><span>Tools</span></button>
+  <button class="nav" data-page="settings"><span class="navicon"><svg fill="none" viewBox="0 0 24 24"><path d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Zm0-5v2m0 13v2m9-8h-2M5 12H3m15.36-6.36-1.41 1.41M7.05 16.95l-1.41 1.41m0-12.72 1.41 1.41m9.9 9.9 1.41 1.41" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></span><span>Settings</span></button>
+  <button class="nav" data-page="logout"><span class="navicon"><svg fill="none" viewBox="0 0 24 24"><path d="M15 5h4v14h-4M11 8l4 4-4 4M15 12H4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span>Log Out</span></button>
+</nav>
+<div class="toast" id="toast"></div>
+</div>
+
+<script>
+const icons = {
+  target:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>`,
+  drag:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 5v10a3 3 0 0 0 6 0V9"/><path d="m6 5-3 3m3-3 3 3M18 19V9a3 3 0 0 0-6 0v6"/><path d="m18 19 3-3m-3 3-3-3"/></svg>`,
+  pulse:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 12h4l2-6 4 12 2-6h6"/></svg>`,
+  bolt:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="m13 2-9 12h7l-1 8 9-12h-7l1-8Z"/></svg>`,
+  network:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="5" r="2"/><circle cx="5" cy="18" r="2"/><circle cx="19" cy="18" r="2"/><path d="m11 7-5 9m7-9 5 9M7 18h10"/></svg>`,
+  shield:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 3 20 6v5c0 5-3.3 8.3-8 10-4.7-1.7-8-5-8-10V6l8-3Z"/><path d="m8.5 12 2.2 2.2 4.8-5"/></svg>`,
+  gear:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-1.8 1.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V20h-2.5v-.1a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1-1.8-1.8.1-.1A1.7 1.7 0 0 0 8 15a1.7 1.7 0 0 0-1.5-1H6v-2.5h.5A1.7 1.7 0 0 0 8 10a1.7 1.7 0 0 0-.3-1.9l-.1-.1 1.8-1.8.1.1a1.7 1.7 0 0 0 1.9.3 1.7 1.7 0 0 0 1-1.5V5h2.5v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1 1.8 1.8-.1.1A1.7 1.7 0 0 0 19.4 10a1.7 1.7 0 0 0 1.5 1h.1v2.5h-.1a1.7 1.7 0 0 0-1.5 1.5Z"/></svg>`
+};
+
+const data = {
+  aiming:[
+    ["TWEAKS SENSITIVITY","Menyelaraskan tingkat respons sentuhan agar kontrol terasa lebih konsisten dan nyaman.", "target", true],
+    ["RECOIL ADJUSTMENT","Mengoptimalkan respons kontrol agar gerakan terasa lebih stabil.", "target", true],
+    ["DRAG RESPONSE","Mengatur respons gerakan sentuh agar transisi terasa lebih halus.", "drag", true],
+    ["ENHANCED ASSIST","Membantu membuat kontrol terasa lebih responsif, presisi, dan cepat.", "pulse", true],
+    ["SENSI X","Booster sensitivitas pada sudut tertentu.", "bolt", true, "mini"],
+    ["SENSI Y","Booster sensitivitas pada sudut tertentu.", "bolt", true, "mini"],
+    ["SENSI Z","Booster sensitivitas pada sudut tertentu.", "bolt", true, "mini"],
+    ["DRAG CONTROL","Stabilkan movement pada saat melakukan swipe.", "drag", true, "mini"]
+  ],
+  optimizer:[
+    ["PERFORMANCE BOOST","Prioritaskan respons aplikasi dan kurangi beban proses yang tidak perlu.", "bolt", true],
+    ["MEMORY BALANCE","Optimalkan penggunaan memori agar aplikasi tetap terasa ringan.", "pulse", true],
+    ["TOUCH RESPONSE","Kurangi jeda input untuk pengalaman kontrol yang lebih konsisten.", "target", true],
+    ["THERMAL BALANCE","Mode adaptif untuk menjaga performa tetap stabil dalam sesi panjang.", "shield", true]
+  ],
+  network:[
+    ["PING STABILIZER","Menjaga kestabilan koneksi agar respons jaringan lebih konsisten.", "network", true],
+    ["PING SPEED INCREASE","Membantu mengurangi delay saat kondisi jaringan berubah.", "bolt", true],
+    ["NETWORK FOCUS MODE","Fokuskan prioritas koneksi agar kestabilan tetap terjaga.", "network", true],
+    ["CONNECTION GUARD","Pantau status koneksi dan tampilkan perubahan secara real-time.", "shield", true]
+  ],
+  generator:[
+    ["PROFILE GENERATOR","Buat preset konfigurasi baru dengan parameter yang bisa kamu atur.", "gear", true],
+    ["QUICK PRESET","Terapkan preset cepat untuk sesi penggunaan yang berbeda.", "bolt", true],
+    ["RANDOMIZER","Generate kombinasi pengaturan secara acak untuk eksperimen.", "pulse", true],
+    ["EXPORT PROFILE","Simpan konfigurasi lokal agar mudah dipakai kembali.", "shield", true]
+  ]
+};
+
+const cards = document.getElementById('cards');
+const toast = document.getElementById('toast');
+let currentCat='aiming';
+
+function showToast(msg){
+  toast.textContent=msg; toast.classList.add('show');
+  clearTimeout(showToast.t); showToast.t=setTimeout(()=>toast.classList.remove('show'),1700);
+}
+function keyFor(title){return 'rtxb_'+title.replace(/\W+/g,'_')}
+function getState(title){return localStorage.getItem(keyFor(title))==='1'}
+function setState(title,v){localStorage.setItem(keyFor(title),v?'1':'0')}
+
+function render(cat){
+  currentCat=cat;
+  cards.innerHTML='';
+  const arr=data[cat];
+  const regular=arr.filter(x=>x[4]!=='mini'), mini=arr.filter(x=>x[4]==='mini');
+  regular.forEach(x=>cards.appendChild(makeCard(x)));
+  if(mini.length){
+    const grid=document.createElement('div'); grid.className='grid2';
+    mini.forEach(x=>grid.appendChild(makeCard(x)));
+    cards.appendChild(grid);
+  }
+}
+function makeCard(x){
+  const [title,desc,ico,vip,type]=x;
+  const el=document.createElement('div'); el.className=type==='mini'?'mini':'card';
+  const state=getState(title);
+  el.innerHTML= type==='mini'
+    ? `<div class="title">${title} ${vip?'<span class="vip">PRO</span>':''}</div><div class="desc">${desc}</div><div class="mini-bottom"><span>${state?'ON':'OFF'}</span><button class="switch ${state?'on':''}" aria-label="toggle"><i></i></button></div>`
+    : `<div class="icon">${icons[ico]}</div><div class="info"><div class="title">${title} ${vip?'<span class="vip">PRO</span>':''}</div><div class="desc">${desc}</div></div><button class="switch ${state?'on':''}" aria-label="toggle"><i></i></button>`;
+  const sw=el.querySelector('.switch');
+  sw.onclick=()=>{
+    const next=!getState(title); setState(title,next);
+    sw.classList.toggle('on',next);
+    if(type==='mini') el.querySelector('.mini-bottom span').textContent=next?'ON':'OFF';
+    showToast(`${title} ${next?'AKTIF':'DIMATIKAN'} ✦`);
+  };
+  return el;
+}
+
+document.querySelectorAll('.pill').forEach(p=>p.onclick=()=>{
+  document.querySelectorAll('.pill').forEach(x=>x.classList.remove('active'));
+  p.classList.add('active'); render(p.dataset.cat);
+});
+document.querySelectorAll('.nav').forEach(n=>n.onclick=()=>{
+  document.querySelectorAll('.nav').forEach(x=>x.classList.remove('active')); n.classList.add('active');
+  const page=n.dataset.page;
+  if(page==='tools'){render(currentCat); return}
+  if(page==='info'){
+    cards.innerHTML=`<div class="empty"><b style="color:#ffd21a">NEXORA TOOLS</b><br><br>Performance Control Center<br><span style="font-size:9px">Local interface • SVG powered • v1.0</span></div>`; return;
+  }
+  if(page==='settings'){
+    cards.innerHTML=`<div class="cards">
+      <div class="card"><div class="icon">${icons.gear}</div><div class="info"><div class="title">UI ACCENT</div><div class="desc">Tema NEXORA TOOLS menggunakan neon violet dengan panel gelap.</div></div></div>
+      <div class="card"><div class="icon">${icons.shield}</div><div class="info"><div class="title">LOCAL STORAGE</div><div class="desc">Status toggle disimpan otomatis di browser perangkat ini.</div></div><button class="switch on" id="clear"><i></i></button></div>
+    </div>`;
+    document.getElementById('clear').onclick=()=>{localStorage.clear();showToast('Semua status di-reset ✦');render(currentCat)};
+    return;
+  }
+  if(page==='logout'){
+    showToast('Menutup NEXORA TOOLS…');
+    setTimeout(()=>{
+      // Try to close the browser/app window when permitted.
+      window.close();
+      // If the browser blocks window.close(), show a clean exit screen.
+      setTimeout(()=>{
+        document.body.innerHTML = `
+          <div style="min-height:100vh;background:#050505;color:#f5f5f5;display:grid;place-items:center;text-align:center;padding:24px;font-family:system-ui,sans-serif">
+            <div>
+              <div style="font-size:42px;color:#ffd21a;margin-bottom:16px">◈</div>
+              <div style="font-size:22px;font-weight:900;letter-spacing:2px">NEXORA TOOLS</div>
+              <div style="margin-top:8px;color:#999;font-size:12px">SESSION CLOSED</div>
+              <button onclick="location.reload()" style="margin-top:24px;padding:12px 20px;border-radius:10px;border:1px solid #806600;background:#1b180b;color:#ffd21a;font-weight:800">OPEN AGAIN</button>
+            </div>
+          </div>`;
+      }, 350);
+    }, 450);
+  }
+});
+
+render('aiming');
+
+const logs=[
+  'initializing NEXORA core...',
+  'loading SVG interface modules...',
+  'checking performance profile...',
+  'mounting control panels...',
+  'syncing local preferences...',
+  'all systems operational.'
+];
+let i=0, progress=0;
+const logEl=document.getElementById('bootlog'), bar=document.getElementById('bar'), boot=document.getElementById('boot');
+const timer=setInterval(()=>{
+  progress+=Math.floor(Math.random()*12)+7;
+  if(progress>100) progress=100;
+  bar.style.width=progress+'%';
+  if(i<logs.length){logEl.innerHTML += `<div><b>›</b> ${logs[i++]}</div>`; logEl.scrollTop=logEl.scrollHeight;}
+  if(progress>=100){clearInterval(timer);setTimeout(()=>boot.classList.add('hide'),500);}
+},220);
+</script>
+</body>
+      </html>
